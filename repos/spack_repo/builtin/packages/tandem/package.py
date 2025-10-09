@@ -41,6 +41,8 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
     # longer be usable in preprocessor conditionals without explicit definition.
     patch("fix_v1.0_compilation.diff", when="@1.0")
 
+    patch("allow_petsc3.21.diff", when="@:1.1 ^petsc@3.20:")
+
     maintainers("dmay23", "Thomas-Ulrich")
     variant("polynomial_degree", default="2", description="Polynomial degree")
     variant(
@@ -87,7 +89,7 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("petsc +int64 +mumps +scalapack memalign=32")
     depends_on("petsc@3.22", when="@1.2:")
-    depends_on("petsc@3.16:3.19", when="@:1.1")
+    depends_on("petsc@3.16:3.21", when="@:1.1")
 
     depends_on("petsc +knl", when="target=skylake:")
 

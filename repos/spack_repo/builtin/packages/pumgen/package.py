@@ -16,6 +16,9 @@ class Pumgen(CMakePackage):
     version("master", branch="master", submodules=True)
 
     version(
+        "1.1.2", tag="v1.1.2", commit="4e2cd979ca697e525ae9888aa218d97bee24915f", submodules=True
+    )
+    version(
         "1.1.1", tag="v1.1.1", commit="ad3d0f22edfdb72713ef7bb42a41251fa7275bd8", submodules=True
     )
     version(
@@ -44,7 +47,7 @@ class Pumgen(CMakePackage):
         )
         depends_on("zoltan@3.83 +parmetis+int64 ~fortran +shared")
 
-    depends_on("easi@1.2: +asagi jit=impalajit,lua", when="+with_simmetrix")
+    depends_on("easi@1.6.1: +asagi jit=impalajit,lua", when="+with_simmetrix")
 
     def cmake_args(self):
         args = [self.define_from_variant("SIMMETRIX", "with_simmetrix")]
