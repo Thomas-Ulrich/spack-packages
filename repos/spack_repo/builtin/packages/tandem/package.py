@@ -22,13 +22,25 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("main", branch="main", submodules=True)
-    version("1.2.0-rc", branch="dmay/staging", submodules=True)
-
+    version(
+        "1.2.0",
+        tag="v1.2.0",
+        commit="b75f66692d299673bf85632ed71e2a7da71ff2e0",
+        submodules=True,
+    )
     # we cannot use the tar.gz file because it does not contains submodules
     version(
-        "1.1.0", tag="v1.1.0", commit="17c42dc9ae0ec519dcc1b5732681b2e4054666f1", submodules=True
+        "1.1.0",
+        tag="v1.1.0",
+        commit="17c42dc9ae0ec519dcc1b5732681b2e4054666f1",
+        submodules=True,
     )
-    version("1.0", tag="v1.0", commit="eccab10cbdf5842ed9903fac7a023be5e2779f36", submodules=True)
+    version(
+        "1.0",
+        tag="v1.0",
+        commit="eccab10cbdf5842ed9903fac7a023be5e2779f36",
+        submodules=True,
+    )
 
     # Simplex.h: Added #include <limits> to ensure std::numeric_limits is available explicitly,
     # as required by standard-compliant compilers like GCC.
@@ -57,6 +69,7 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
     )
     variant("libxsmm", default=False, description="Install libxsmm-generator")
     variant("python", default=False, description="installs python and numpy")
+    variant("hdf5", default=True, description="enable hdf5 support")
 
     depends_on("c", type="build")  # generated
     depends_on("cxx", type="build")  # generated
@@ -68,7 +81,8 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
     for var in ["openmpi", "mpich"]:
         for tgt in CudaPackage.cuda_arch_values:
             depends_on(
-                f"{var} +cuda cuda_arch={tgt}", when=f"+cuda cuda_arch={tgt} ^[virtuals=mpi] {var}"
+                f"{var} +cuda cuda_arch={tgt}",
+                when=f"+cuda cuda_arch={tgt} ^[virtuals=mpi] {var}",
             )
 
     # these are not cuda packages
@@ -80,11 +94,12 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("libxsmm@1.17 +generator", when="+libxsmm target=x86_64:")
     depends_on("lua@5.3.2:5.4.4")
     depends_on("eigen@3.4.0")
+    depends_on("hdf5 +shared +hl +mpi", when="+hdf5")
 
     depends_on("zlib-api")
 
     depends_on("petsc +int64 +mumps +scalapack memalign=32")
-    depends_on("petsc@3.22", when="@1.2:")
+    depends_on("petsc@3.22", when="@1.2")
     depends_on("petsc@3.16:3.19", when="@:1.1")
 
     depends_on("petsc +knl", when="target=skylake:")
@@ -94,7 +109,9 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
             depends_on(f"petsc +cuda cuda_arch={tgt}", when=f"+cuda cuda_arch={tgt}")
     with when("+rocm"):
         for tgt in ROCmPackage.amdgpu_targets:
-            depends_on(f"petsc +rocm amdgpu_target={tgt}", when=f"+rocm amdgpu_target={tgt}")
+            depends_on(
+                f"petsc +rocm amdgpu_target={tgt}", when=f"+rocm amdgpu_target={tgt}"
+            )
 
     depends_on("python@3", type="build", when="+python")
     depends_on("python@3.9:", type="build", when="@:1.2 +python")
@@ -122,6 +139,7 @@ class Tandem(CMakePackage, CudaPackage, ROCmPackage):
             self.define_from_variant("DOMAIN_DIMENSION", "domain_dimension"),
             self.define_from_variant("POLYNOMIAL_DEGREE", "polynomial_degree"),
             self.define_from_variant("MIN_QUADRATURE_ORDER", "min_quadrature_order"),
+            self.define_from_variant("ENABLE_HDF5", "hdf5"),
         ]
 
         arch_dic = {}
